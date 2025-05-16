@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import { MainSeeder } from "./main.seeder";
 import { userFactory } from "./factory/user.factory";
 import { entrepriseFactory } from "./factory/entreprise.factory";
+import { entrepriseToUserFactory } from "./factory/entreprise-to-user.factory";
 
 dotenv.config();
 
@@ -24,7 +25,8 @@ dotenv.config();
         seeds: [MainSeeder],
         factories: [
             userFactory,
-            entrepriseFactory
+            entrepriseFactory,
+            entrepriseToUserFactory,
         ],
         synchronize: true
     }
