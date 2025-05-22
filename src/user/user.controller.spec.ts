@@ -3,6 +3,7 @@ import { UserController } from './user.controller'
 import { UserService } from './user.service'
 import * as httpMocks from 'node-mocks-http'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
 
 describe('UserController', () => {
   let userController: UserController
@@ -15,6 +16,7 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: {
+            resetPassword: jest.fn().mockReturnValue('messageId'),
             resetPasswordConfirm: jest.fn().mockReturnValue({
               access_token: 'token',
               refresh_token: 'token',
@@ -30,6 +32,28 @@ describe('UserController', () => {
 
   it('shoulod be defined', () => {
     expect(userController).toBeDefined()
+  })
+
+  describe('resetPassword', () => {
+    it('should return a messageId', async () => {
+      const req: Request = httpMocks.createRequest({
+        method: 'POST',
+        url: 'api/v1/users/reset-password',
+        user: {
+          id: 1,
+        },
+      })
+
+      const resetPasswordDto: ResetPasswordDto = {
+        email: 'john.doe@gmail.com',
+      }
+
+      await expect(
+        userController.resetPassword(req, resetPasswordDto)
+      ).resolves.toEqual('messageId')
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(userService.resetPassword).toHaveBeenCalledWith(resetPasswordDto)
+    })
   })
 
   describe('resetPasswordConfirm', () => {

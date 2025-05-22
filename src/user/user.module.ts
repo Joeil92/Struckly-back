@@ -6,9 +6,14 @@ import { APP_GUARD } from '@nestjs/core'
 import { RolesGuard } from 'common/guard/role.guard'
 import { UserController } from './user.controller'
 import { AuthModule } from '../auth/auth.module'
+import { MailerModule } from '../mailer/mailer.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), forwardRef(() => AuthModule)],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    forwardRef(() => AuthModule),
+    MailerModule,
+  ],
   controllers: [UserController],
   providers: [
     UserService,

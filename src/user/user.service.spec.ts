@@ -6,6 +6,8 @@ import { AuthService } from '../auth/auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
+import { MailerService } from '../mailer/mailer.service'
+import * as bcrypt from 'bcrypt'
 
 const oneUser: User = {
   id: '1',
@@ -49,6 +51,12 @@ describe('UserService', () => {
           },
         },
         {
+          provide: MailerService,
+          useValue: {
+            sendMail: jest.fn().mockReturnValue({ messageId: 'messageId' }),
+          },
+        },
+        {
           provide: JwtService,
           useValue: {
             sign: jest.fn().mockReturnValue('token'),
@@ -82,6 +90,22 @@ describe('UserService', () => {
     })
   })
 
+  describe('resetPassword()', () => {
+    jest.spyOn(bcrypt, 'hash').mockImplementation(() => 'hash')
+
+    it('should send email and return messageId', async () => {
+      await expect(
+        service.resetPassword({ email: 'john.doe@gmail.com' })
+      ).resolves.toEqual('messageId')
+    })
+
+    it('should throw an error if email is not found', async () => {
+      await expect(
+        service.resetPassword({ email: 'john.not-doe@gmail.com' })
+      ).rejects.toThrow('Invalid payload')
+    })
+  })
+
   describe('resetPasswordConfirm()', () => {
     it('should reset user password and generate tokens successfully', async () => {
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
@@ -89,6 +113,8 @@ describe('UserService', () => {
         userId: '1',
         password: '123456789',
       }
+
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
 
       await expect(
         service.resetPasswordConfirm(resetPasswordConfirmDto)
@@ -104,6 +130,8 @@ describe('UserService', () => {
         userId: '1',
         password: '123456789',
       }
+
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => false)
 
       await expect(
         service.resetPasswordConfirm(resetPasswordConfirmDto)
@@ -129,6 +157,8 @@ describe('UserService', () => {
           tokenExpiresAt: new Date(Date.now() - 1000),
         })
       )
+
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
 
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
         token: 'resetToken',

@@ -12,6 +12,10 @@ import * as bcrypt from 'bcrypt'
 import { AuthService } from '../auth/auth.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
+import { ResetPasswordDto } from './dto/reset-password.dto'
+import { MailerService } from '../mailer/mailer.service'
+import * as crypto from 'crypto'
+import { SendMailDto } from '../mailer/dto/send-mail.dto'
 
 @Injectable()
 export class UserService {
@@ -20,6 +24,7 @@ export class UserService {
     private userRepository: Repository<User>,
     @Inject(forwardRef(() => AuthService))
     private authService: AuthService,
+    private mailerService: MailerService,
     private configService: ConfigService
   ) {}
 
@@ -37,16 +42,55 @@ export class UserService {
     })
   }
 
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const user = await this.findByEmail(resetPasswordDto.email)
+
+    if (!user) {
+      throw new HttpException('Invalid payload', HttpStatus.NOT_FOUND)
+    }
+
+    const token = crypto.randomBytes(32).toString('hex')
+    const hash = await bcrypt.hash(
+      token,
+      Number(this.configService.get<number>('SALT_ROUNDS'))
+    )
+    user.resetToken = hash
+    user.tokenExpiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 hours expiration
+
+    const mailOptions: SendMailDto = {
+      to: user.email,
+      subject: 'Struckly - Reset your password',
+      context: {
+        firstname: user.firstName,
+        resetPasswordUrl: `${this.configService.get<string>('APP_URL')}/reset-password?token=${token}&userId=${user.id}`,
+      },
+    }
+
+    const mail = await this.mailerService.sendMail(
+      mailOptions,
+      'reset-password'
+    )
+
+    await this.userRepository.save(user)
+
+    return mail.messageId
+  }
+
   async resetPasswordConfirm(
     resetPasswordDto: ResetPasswordConfirmDto
   ): Promise<{ access_token: string; refresh_token: string }> {
     const user = await this.findById(resetPasswordDto.userId)
 
-    if (
-      !user ||
-      !user.resetToken ||
-      user.resetToken !== resetPasswordDto.token
-    ) {
+    if (!user || !user.resetToken) {
+      throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
+    }
+
+    const isValid = await bcrypt.compare(
+      resetPasswordDto.token,
+      user.resetToken
+    )
+
+    if (!isValid) {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
     }
 
@@ -56,7 +100,7 @@ export class UserService {
 
     user.password = await bcrypt.hash(
       resetPasswordDto.password,
-      this.configService.get<number>('SALT_ROUNDS') as number
+      Number(this.configService.get<number>('SALT_ROUNDS'))
     )
     await this.userRepository.save(user)
 

@@ -1,7 +1,9 @@
-import { Body, Controller, Logger, Patch, Request } from '@nestjs/common'
+import { Body, Controller, Logger, Patch, Post, Request } from '@nestjs/common'
 import { ApiBearerAuth } from '@nestjs/swagger'
 import { UserService } from './user.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
+import { ResetPasswordDto } from './dto/reset-password.dto'
+import { Public } from '../../common/decorator/auth.decorator'
 
 @ApiBearerAuth()
 @Controller('user')
@@ -10,6 +12,17 @@ export class UserController {
 
   constructor(private userService: UserService) {}
 
+  @Public()
+  @Post('reset-password')
+  async resetPassword(
+    @Request() request: Request,
+    @Body() resetPasswordDto: ResetPasswordDto
+  ) {
+    this.logger.log(`${request.method} ${request.url}`)
+    return this.userService.resetPassword(resetPasswordDto)
+  }
+
+  @Public()
   @Patch('reset-password/confirm')
   async resetPasswordConfirm(
     @Request() request: Request,
