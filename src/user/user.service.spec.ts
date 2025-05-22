@@ -107,7 +107,31 @@ describe('UserService', () => {
   })
 
   describe('resetPasswordConfirm()', () => {
-    it('should reset user password and generate tokens successfully', async () => {
+    it('should reset user password and generate tokens successfully with tokenExpiresAt', async () => {
+      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
+        token: 'resetToken',
+        userId: '1',
+        password: '123456789',
+      }
+
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
+
+      await expect(
+        service.resetPasswordConfirm(resetPasswordConfirmDto)
+      ).resolves.toEqual({
+        access_token: 'token',
+        refresh_token: 'token',
+      })
+    })
+
+    it('should reset user password and generate tokens successfully without tokenExpiresAt', async () => {
+      jest.spyOn(service, 'findById').mockImplementation(() =>
+        Promise.resolve({
+          ...oneUser,
+          tokenExpiresAt: null,
+        })
+      )
+
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
         token: 'resetToken',
         userId: '1',

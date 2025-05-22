@@ -94,7 +94,7 @@ export class UserService {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
     }
 
-    if (user.tokenExpiresAt! < new Date()) {
+    if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
       throw new HttpException('Token expired', HttpStatus.GONE)
     }
 
