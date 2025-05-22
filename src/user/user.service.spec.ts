@@ -1,11 +1,27 @@
 import { Test } from '@nestjs/testing'
 import { UserService } from './user.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { User } from './entity/user.entity'
+import { User, UserRole } from './entity/user.entity'
+import { AuthService } from '../auth/auth.service'
+import { JwtService } from '@nestjs/jwt'
+import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
+import { ConfigService } from '@nestjs/config'
 
-const oneUser = {
+const oneUser: User = {
+  id: '1',
   email: 'john.doe@gmail.com',
+  firstName: 'John',
+  lastName: 'Doe',
+  gender: 'male',
+  avatarUrl: 'https://avatar.com',
+  roles: [UserRole.USER],
+  entrepriseToUsers: [],
   password: '123456789',
+  resetToken: 'resetToken',
+  tokenExpiresAt: new Date('2025-05-23T00:00:00.000Z'),
+  updatedAt: new Date('2025-05-23T00:00:00.000Z'),
+  deletedAt: null,
+  createdAt: new Date('2025-05-23T00:00:00.000Z'),
 }
 
 describe('UserService', () => {
@@ -15,14 +31,33 @@ describe('UserService', () => {
     const module = await Test.createTestingModule({
       providers: [
         UserService,
+        AuthService,
         {
           provide: getRepositoryToken(User),
           useValue: {
+            save: jest.fn().mockReturnValue(Promise.resolve(oneUser)),
             findOneBy: jest
               .fn()
-              .mockImplementation(({ email }: { email: string }) =>
-                Promise.resolve(email === 'john.doe@gmail.com' ? oneUser : null)
+              .mockImplementation(
+                ({ id, email }: { id: string; email: string }) =>
+                  Promise.resolve(
+                    email === 'john.doe@gmail.com' || id === '1'
+                      ? oneUser
+                      : null
+                  )
               ),
+          },
+        },
+        {
+          provide: JwtService,
+          useValue: {
+            sign: jest.fn().mockReturnValue('token'),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue(10),
           },
         },
       ],
@@ -44,6 +79,66 @@ describe('UserService', () => {
     it('should return null if not found', async () => {
       const email = 'john.not-doe@gmail.com'
       await expect(service.findByEmail(email)).resolves.toBeNull()
+    })
+  })
+
+  describe('resetPasswordConfirm()', () => {
+    it('should reset user password and generate tokens successfully', async () => {
+      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
+        token: 'resetToken',
+        userId: '1',
+        password: '123456789',
+      }
+
+      await expect(
+        service.resetPasswordConfirm(resetPasswordConfirmDto)
+      ).resolves.toEqual({
+        access_token: 'token',
+        refresh_token: 'token',
+      })
+    })
+
+    it('should throw an error if token is invalid', async () => {
+      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
+        token: 'notResetToken',
+        userId: '1',
+        password: '123456789',
+      }
+
+      await expect(
+        service.resetPasswordConfirm(resetPasswordConfirmDto)
+      ).rejects.toThrow('Invalid payload')
+    })
+
+    it('should throw an error if user is not found', async () => {
+      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
+        token: 'resetToken',
+        userId: '2',
+        password: '123456789',
+      }
+
+      await expect(
+        service.resetPasswordConfirm(resetPasswordConfirmDto)
+      ).rejects.toThrow('Invalid payload')
+    })
+
+    it('should throw an error if token has expired', async () => {
+      jest.spyOn(service, 'findById').mockImplementation(() =>
+        Promise.resolve({
+          ...oneUser,
+          tokenExpiresAt: new Date(Date.now() - 1000),
+        })
+      )
+
+      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
+        token: 'resetToken',
+        userId: '1',
+        password: '123456789',
+      }
+
+      await expect(
+        service.resetPasswordConfirm(resetPasswordConfirmDto)
+      ).rejects.toThrow('Token expired')
     })
   })
 })
