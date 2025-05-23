@@ -1,5 +1,13 @@
-import { Body, Controller, Logger, Patch, Post, Request } from '@nestjs/common'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Logger,
+  Patch,
+  Post,
+  Request,
+} from '@nestjs/common'
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
 import { UserService } from './user.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -14,6 +22,14 @@ export class UserController {
 
   @Public()
   @Post('reset-password')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully send mail to reset password',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
   async resetPassword(
     @Request() request: Request,
     @Body() resetPasswordDto: ResetPasswordDto
@@ -24,6 +40,18 @@ export class UserController {
 
   @Public()
   @Patch('reset-password/confirm')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully reset password',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid payload',
+  })
+  @ApiResponse({
+    status: HttpStatus.GONE,
+    description: 'Token expired',
+  })
   async resetPasswordConfirm(
     @Request() request: Request,
     @Body() ResetPasswordConfirmDto: ResetPasswordConfirmDto
