@@ -102,6 +102,8 @@ export class UserService {
       resetPasswordDto.password,
       Number(this.configService.get<number>('SALT_ROUNDS'))
     )
+    user.resetToken = null
+    user.tokenExpiresAt = null
     await this.userRepository.save(user)
 
     return this.authService.generateTokens(user)

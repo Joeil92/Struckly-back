@@ -14,7 +14,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto'
 import { Public } from '../../common/decorator/auth.decorator'
 
 @ApiBearerAuth()
-@Controller('user')
+@Controller('users')
 export class UserController {
   private readonly logger = new Logger(UserController.name)
 

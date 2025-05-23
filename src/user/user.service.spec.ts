@@ -122,12 +122,15 @@ describe('UserService', () => {
         access_token: 'token',
         refresh_token: 'token',
       })
+      expect(oneUser.resetToken).toBeNull()
+      expect(oneUser.tokenExpiresAt).toBeNull()
     })
 
     it('should reset user password and generate tokens successfully without tokenExpiresAt', async () => {
       jest.spyOn(service, 'findById').mockImplementation(() =>
         Promise.resolve({
           ...oneUser,
+          resetToken: 'resetToken',
           tokenExpiresAt: null,
         })
       )
@@ -146,9 +149,14 @@ describe('UserService', () => {
         access_token: 'token',
         refresh_token: 'token',
       })
+      expect(oneUser.resetToken).toBeNull()
+      expect(oneUser.tokenExpiresAt).toBeNull()
     })
 
     it('should throw an error if token is invalid', async () => {
+      oneUser.resetToken = 'resetToken'
+      oneUser.tokenExpiresAt = new Date('2025-05-23T00:00:00.000Z')
+
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
         token: 'notResetToken',
         userId: '1',
