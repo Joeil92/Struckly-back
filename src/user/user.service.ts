@@ -62,7 +62,7 @@ export class UserService {
       subject: 'Struckly - Reset your password',
       context: {
         firstname: user.firstName,
-        resetPasswordUrl: `${this.configService.get<string>('APP_URL')}/reset-password?token=${token}&userId=${user.id}`,
+        resetPasswordUrl: `${this.configService.get<string>('APP_URL')}/reset-password/confirm?token=${token}&userId=${user.id}`,
       },
     }
 
