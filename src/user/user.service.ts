@@ -62,7 +62,7 @@ export class UserService {
       subject: 'Struckly - Reset your password',
       context: {
         firstname: user.firstName,
-        resetPasswordUrl: `${this.configService.get<string>('APP_URL')}/reset-password?token=${token}&userId=${user.id}`,
+        resetPasswordUrl: `${this.configService.get<string>('APP_URL')}/reset-password/confirm?token=${token}&userId=${user.id}`,
       },
     }
 
@@ -78,7 +78,7 @@ export class UserService {
 
   async resetPasswordConfirm(
     resetPasswordDto: ResetPasswordConfirmDto
-  ): Promise<{ access_token: string; refresh_token: string }> {
+  ): Promise<{ message: string }> {
     const user = await this.findById(resetPasswordDto.userId)
 
     if (!user || !user.resetToken) {
@@ -106,6 +106,6 @@ export class UserService {
     user.tokenExpiresAt = null
     await this.userRepository.save(user)
 
-    return this.authService.generateTokens(user)
+    return { message: 'Password reset successfully' }
   }
 }

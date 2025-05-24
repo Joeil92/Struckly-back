@@ -118,10 +118,7 @@ describe('UserService', () => {
 
       await expect(
         service.resetPasswordConfirm(resetPasswordConfirmDto)
-      ).resolves.toEqual({
-        access_token: 'token',
-        refresh_token: 'token',
-      })
+      ).resolves.toEqual({ message: 'Password reset successfully' })
       expect(oneUser.resetToken).toBeNull()
       expect(oneUser.tokenExpiresAt).toBeNull()
     })
@@ -145,10 +142,7 @@ describe('UserService', () => {
 
       await expect(
         service.resetPasswordConfirm(resetPasswordConfirmDto)
-      ).resolves.toEqual({
-        access_token: 'token',
-        refresh_token: 'token',
-      })
+      ).resolves.toEqual({ message: 'Password reset successfully' })
       expect(oneUser.resetToken).toBeNull()
       expect(oneUser.tokenExpiresAt).toBeNull()
     })
