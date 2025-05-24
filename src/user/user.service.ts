@@ -1,15 +1,8 @@
-import {
-  forwardRef,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './entity/user.entity'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
-import { AuthService } from '../auth/auth.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
 import { ResetPasswordDto } from './dto/reset-password.dto'
@@ -22,8 +15,6 @@ export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
-    @Inject(forwardRef(() => AuthService))
-    private authService: AuthService,
     private mailerService: MailerService,
     private configService: ConfigService
   ) {}
@@ -46,7 +37,7 @@ export class UserService {
     const user = await this.findByEmail(resetPasswordDto.email)
 
     if (!user) {
-      throw new HttpException('Invalid payload', HttpStatus.NOT_FOUND)
+      return
     }
 
     const token = crypto.randomBytes(32).toString('hex')
@@ -66,14 +57,9 @@ export class UserService {
       },
     }
 
-    const mail = await this.mailerService.sendMail(
-      mailOptions,
-      'reset-password'
-    )
+    await this.mailerService.sendMail(mailOptions, 'reset-password')
 
     await this.userRepository.save(user)
-
-    return mail.messageId
   }
 
   async resetPasswordConfirm(

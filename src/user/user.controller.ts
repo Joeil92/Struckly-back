@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   HttpStatus,
   Logger,
   Patch,
@@ -22,13 +23,10 @@ export class UserController {
 
   @Public()
   @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Successfully send mail to reset password',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'User not found',
   })
   async resetPassword(
     @Request() request: Request,

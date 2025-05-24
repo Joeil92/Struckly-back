@@ -2,8 +2,6 @@ import { Test } from '@nestjs/testing'
 import { UserService } from './user.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { User, UserRole } from './entity/user.entity'
-import { AuthService } from '../auth/auth.service'
-import { JwtService } from '@nestjs/jwt'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '../mailer/mailer.service'
@@ -28,12 +26,12 @@ const oneUser: User = {
 
 describe('UserService', () => {
   let service: UserService
+  let mailerService: MailerService
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         UserService,
-        AuthService,
         {
           provide: getRepositoryToken(User),
           useValue: {
@@ -57,12 +55,6 @@ describe('UserService', () => {
           },
         },
         {
-          provide: JwtService,
-          useValue: {
-            sign: jest.fn().mockReturnValue('token'),
-          },
-        },
-        {
           provide: ConfigService,
           useValue: {
             get: jest.fn().mockReturnValue(10),
@@ -72,6 +64,7 @@ describe('UserService', () => {
     }).compile()
 
     service = module.get(UserService)
+    mailerService = module.get(MailerService)
   })
 
   it('should be defined', () => {
@@ -96,13 +89,17 @@ describe('UserService', () => {
     it('should send email and return messageId', async () => {
       await expect(
         service.resetPassword({ email: 'john.doe@gmail.com' })
-      ).resolves.toEqual('messageId')
+      ).resolves.toBeUndefined()
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mailerService.sendMail).toHaveBeenCalled()
     })
 
-    it('should throw an error if email is not found', async () => {
+    it("should don't send email and throw an error if user is not found", async () => {
       await expect(
         service.resetPassword({ email: 'john.not-doe@gmail.com' })
-      ).rejects.toThrow('Invalid payload')
+      ).resolves.toBeUndefined()
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mailerService.sendMail).not.toHaveBeenCalled()
     })
   })
 
