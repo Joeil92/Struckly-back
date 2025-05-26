@@ -28,6 +28,13 @@ describe('EntrepriseService', () => {
                   siretNumber === '123456789' ? oneEntreprise : null
                 )
               ),
+            createQueryBuilder: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnThis(),
+              leftJoin: jest.fn().mockReturnThis(),
+              loadRelationCountAndMap: jest.fn().mockReturnThis(),
+              where: jest.fn().mockReturnThis(),
+              getMany: jest.fn().mockResolvedValue([oneEntreprise]),
+            }),
           },
         },
       ],
@@ -89,6 +96,15 @@ describe('EntrepriseService', () => {
     it('should return null if not found', async () => {
       const siretNumber = '12345678910'
       await expect(service.findBySiret(siretNumber)).resolves.toBeNull()
+    })
+  })
+
+  describe('findEntreprisesByUserId()', () => {
+    it('should return an array of entreprises if userId exists', async () => {
+      const userId = '123456789'
+      await expect(service.findEntreprisesByUserId(userId)).resolves.toEqual([
+        oneEntreprise,
+      ])
     })
   })
 })

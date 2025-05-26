@@ -33,4 +33,17 @@ export class EntrepriseService {
   async findBySiret(siret: string): Promise<Entreprise | null> {
     return await this.entrepriseRepository.findOneBy({ siretNumber: siret })
   }
+
+  async findEntreprisesByUserId(userId: string): Promise<Entreprise[]> {
+    return await this.entrepriseRepository
+      .createQueryBuilder('entreprise')
+      .select(['entreprise.id', 'entreprise.name'])
+      .leftJoin('entreprise.entrepriseToUsers', 'entrepriseToUser')
+      .loadRelationCountAndMap(
+        'entreprise.membersCount',
+        'entreprise.entrepriseToUsers'
+      )
+      .where('entrepriseToUser.user.id = :userId', { userId })
+      .getMany()
+  }
 }
