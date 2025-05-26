@@ -4,10 +4,12 @@ import { User } from './entity/user.entity'
 import { UserService } from './user.service'
 import { APP_GUARD } from '@nestjs/core'
 import { RolesGuard } from 'common/guard/role.guard'
+import { UserController } from './user.controller'
+import { MailerModule } from '../mailer/mailer.module'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
-  controllers: [],
+  imports: [TypeOrmModule.forFeature([User]), MailerModule],
+  controllers: [UserController],
   providers: [
     UserService,
     {

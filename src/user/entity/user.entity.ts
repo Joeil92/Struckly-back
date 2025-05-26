@@ -67,18 +67,14 @@ export class User {
   })
   resetToken: string | null
 
-  @Column({
-    type: 'date',
-    nullable: true,
-    default: null,
-  })
+  @CreateDateColumn({ nullable: true, default: null })
   tokenExpiresAt: Date | null
 
   @UpdateDateColumn()
   updatedAt: Date
 
   @DeleteDateColumn()
-  deletedAt: Date
+  deletedAt: Date | null
 
   @CreateDateColumn()
   createdAt: Date
