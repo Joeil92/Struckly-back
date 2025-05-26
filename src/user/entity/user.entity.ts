@@ -26,7 +26,7 @@ export class User {
   @Column({ name: 'email', type: 'varchar', length: 255 })
   email: string
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
   password: string | null
 
   @Column({ type: 'varchar', length: 255 })
@@ -67,7 +67,7 @@ export class User {
   })
   resetToken: string | null
 
-  @CreateDateColumn({ nullable: true, default: null })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   tokenExpiresAt: Date | null
 
   @UpdateDateColumn()
