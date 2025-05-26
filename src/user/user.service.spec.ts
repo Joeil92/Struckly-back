@@ -28,6 +28,13 @@ describe('UserService', () => {
   let service: UserService
   let mailerService: MailerService
 
+  const mockQueryBuilder = {
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    getOne: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -46,6 +53,7 @@ describe('UserService', () => {
                       : null
                   )
               ),
+            createQueryBuilder: jest.fn(() => mockQueryBuilder),
           },
         },
         {
@@ -73,11 +81,15 @@ describe('UserService', () => {
 
   describe('findByEmail()', () => {
     it('should return a user if email exists', async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(oneUser))
+
       const email = 'john.doe@gmail.com'
       await expect(service.findByEmail(email)).resolves.toEqual(oneUser)
     })
 
     it('should return null if not found', async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(null))
+
       const email = 'john.not-doe@gmail.com'
       await expect(service.findByEmail(email)).resolves.toBeNull()
     })
@@ -87,6 +99,8 @@ describe('UserService', () => {
     jest.spyOn(bcrypt, 'hash').mockImplementation(() => 'hash')
 
     it('should send email and return messageId', async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(oneUser))
+
       await expect(
         service.resetPassword({ email: 'john.doe@gmail.com' })
       ).resolves.toBeUndefined()
@@ -95,6 +109,8 @@ describe('UserService', () => {
     })
 
     it("should don't send email and throw an error if user is not found", async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(null))
+
       await expect(
         service.resetPassword({ email: 'john.not-doe@gmail.com' })
       ).resolves.toBeUndefined()

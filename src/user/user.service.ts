@@ -20,10 +20,12 @@ export class UserService {
   ) {}
 
   async findByEmail(email: string): Promise<User | null> {
-    return await this.userRepository.findOneBy({
-      email,
-      deletedAt: undefined,
-    })
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .andWhere('user.deletedAt IS NULL')
+      .getOne()
   }
 
   async findById(id: string): Promise<User | null> {
