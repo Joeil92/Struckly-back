@@ -1,5 +1,5 @@
 import { IsEmail, IsIn, IsString, MaxLength, MinLength } from 'class-validator'
-import { UserGenderType } from '../entity/user.entity'
+import { UserGenderType } from '../user.entity'
 
 export class CreateUserDto {
   @IsEmail()

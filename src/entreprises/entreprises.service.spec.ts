@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
-import { EntrepriseService } from './entreprise.service'
+import { EntreprisesService } from './entreprises.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Entreprise } from './entity/entreprise.entity'
+import { Entreprise } from './entreprise.entity'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 
 const oneEntreprise = {
@@ -10,13 +10,13 @@ const oneEntreprise = {
   siretNumber: '123456789',
 }
 
-describe('EntrepriseService', () => {
-  let service: EntrepriseService
+describe('EntreprisesService', () => {
+  let service: EntreprisesService
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        EntrepriseService,
+        EntreprisesService,
         {
           provide: getRepositoryToken(Entreprise),
           useValue: {
@@ -40,7 +40,7 @@ describe('EntrepriseService', () => {
       ],
     }).compile()
 
-    service = module.get(EntrepriseService)
+    service = module.get(EntreprisesService)
   })
 
   it('should be defined', () => {

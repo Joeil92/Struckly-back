@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { User } from './entity/user.entity'
+import { User } from './user.entity'
 import { Repository } from 'typeorm'
 import * as bcrypt from 'bcrypt'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
@@ -11,7 +11,7 @@ import * as crypto from 'crypto'
 import { SendMailDto } from '../mailer/dto/send-mail.dto'
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
@@ -69,8 +69,12 @@ export class UserService {
   ): Promise<{ message: string }> {
     const user = await this.findById(resetPasswordDto.userId)
 
-    if (!user || !user.resetToken) {
+    if (!user || !user.resetToken || !user.tokenExpiresAt) {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
+    }
+
+    if (user.tokenExpiresAt < new Date()) {
+      throw new HttpException('Token expired', HttpStatus.GONE)
     }
 
     const isValid = await bcrypt.compare(
@@ -80,10 +84,6 @@ export class UserService {
 
     if (!isValid) {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
-    }
-
-    if (user.tokenExpiresAt && user.tokenExpiresAt < new Date()) {
-      throw new HttpException('Token expired', HttpStatus.GONE)
     }
 
     user.password = await bcrypt.hash(

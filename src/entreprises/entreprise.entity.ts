@@ -8,13 +8,16 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-import { EntrepriseToUser } from '../../entrepriseToUser/entity/entreprise-to-user.entity'
+import { User } from '../users/user.entity'
 
 @Entity('Entreprises')
-@Unique(['siretNumber'])
+@Unique(['siretNumber', 'slug'])
 export class Entreprise {
   @PrimaryGeneratedColumn()
   id: number
+
+  @Column({ type: 'varchar', length: 255 })
+  slug: string
 
   @Column({ type: 'varchar', length: 255 })
   compagnyName: string
@@ -49,15 +52,8 @@ export class Entreprise {
   @Column({ type: 'varchar', length: 255, nullable: true })
   logoUrl: string | null
 
-  @OneToMany(
-    () => EntrepriseToUser,
-    (entrepriseToUser) => entrepriseToUser.entreprise,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
-  )
-  entrepriseToUsers: EntrepriseToUser[]
+  @OneToMany(() => User, (user) => user.entreprise)
+  users: User[]
 
   @UpdateDateColumn()
   updatedAt: Date

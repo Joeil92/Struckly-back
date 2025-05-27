@@ -1,4 +1,4 @@
-import { UserRole } from 'src/user/entity/user.entity'
+import { UserRole } from 'src/users/user.entity'
 
 export interface Payload {
   id: string

@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 import { Repository } from 'typeorm'
-import { Entreprise } from './entity/entreprise.entity'
+import { Entreprise } from './entreprise.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
-export class EntrepriseService {
+export class EntreprisesService {
   constructor(
     @InjectRepository(Entreprise)
     private entrepriseRepository: Repository<Entreprise>
@@ -34,10 +34,10 @@ export class EntrepriseService {
     return await this.entrepriseRepository.findOneBy({ siretNumber: siret })
   }
 
-  async findEntreprisesByUserId(userId: string): Promise<Entreprise[]> {
+  async findEntreprisesByUserId(userId: string) {
     return await this.entrepriseRepository
       .createQueryBuilder('entreprise')
-      .select(['entreprise.id', 'entreprise.name', 'entreprise.logoUrl'])
+      .select(['entreprise.slug', 'entreprise.name', 'entreprise.logoUrl'])
       .leftJoin('entreprise.entrepriseToUsers', 'entrepriseToUser')
       .loadRelationCountAndMap(
         'entreprise.membersCount',

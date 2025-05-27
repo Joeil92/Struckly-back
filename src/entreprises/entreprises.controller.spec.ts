@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
-import { EntrepriseController } from './entreprise.controller'
-import { EntrepriseService } from './entreprise.service'
+import { EntreprisesController } from './entreprises.controller'
+import { EntreprisesService } from './entreprises.service'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 import * as httpMocks from 'node-mocks-http'
 import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
@@ -19,16 +19,16 @@ const entreprise: CreateEntrepriseDto = {
 }
 
 describe('EntrepriseController', () => {
-  let entrepriseController: EntrepriseController
-  let entrepriseService: EntrepriseService
+  let entreprisesController: EntreprisesController
+  let entreprisesService: EntreprisesService
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [EntrepriseController],
+      controllers: [EntreprisesController],
       providers: [
-        EntrepriseService,
+        EntreprisesService,
         {
-          provide: EntrepriseService,
+          provide: EntreprisesService,
           useValue: {
             create: jest
               .fn()
@@ -43,12 +43,12 @@ describe('EntrepriseController', () => {
       ],
     }).compile()
 
-    entrepriseService = moduleRef.get(EntrepriseService)
-    entrepriseController = moduleRef.get(EntrepriseController)
+    entreprisesService = moduleRef.get(EntreprisesService)
+    entreprisesController = moduleRef.get(EntreprisesController)
   })
 
   it('should be defined', () => {
-    expect(entrepriseController).toBeDefined()
+    expect(entreprisesController).toBeDefined()
   })
 
   describe('create', () => {
@@ -62,13 +62,13 @@ describe('EntrepriseController', () => {
       })
 
       await expect(
-        entrepriseController.create(req, entreprise)
+        entreprisesController.create(req, entreprise)
       ).resolves.toEqual({
         id: 1,
         ...entreprise,
       })
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(entrepriseService.create).toHaveBeenCalledWith(entreprise)
+      expect(entreprisesService.create).toHaveBeenCalledWith(entreprise)
     })
   })
 
@@ -82,9 +82,9 @@ describe('EntrepriseController', () => {
         },
       }) as unknown as RequestAuthenticated
 
-      await expect(entrepriseController.findByUserId(req)).resolves.toEqual([])
+      await expect(entreprisesController.findByUserId(req)).resolves.toEqual([])
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(entrepriseService.findEntreprisesByUserId).toHaveBeenCalledWith(
+      expect(entreprisesService.findEntreprisesByUserId).toHaveBeenCalledWith(
         '1'
       )
     })

@@ -7,20 +7,20 @@ import {
   Post,
   Request,
 } from '@nestjs/common'
-import { EntrepriseService } from './entreprise.service'
+import { EntreprisesService } from './entreprises.service'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
-import { UserRole } from '../user/entity/user.entity'
-import { Roles } from '../../common/decorator/role.decorator'
-import { Entreprise } from './entity/entreprise.entity'
+import { UserRole } from '../users/user.entity'
+import { Roles } from '../../common/decorators/role.decorator'
+import { Entreprise } from './entreprise.entity'
 import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
 
 @ApiBearerAuth()
 @Controller('entreprises')
-export class EntrepriseController {
-  private readonly logger = new Logger(EntrepriseController.name)
+export class EntreprisesController {
+  private readonly logger = new Logger(EntreprisesController.name)
 
-  constructor(private entrepriseService: EntrepriseService) {}
+  constructor(private entreprisesService: EntreprisesService) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
@@ -37,7 +37,7 @@ export class EntrepriseController {
     @Body() entreprise: CreateEntrepriseDto
   ): Promise<Entreprise> {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.entrepriseService.create(entreprise)
+    return this.entreprisesService.create(entreprise)
   }
 
   @Get('me')
@@ -49,6 +49,6 @@ export class EntrepriseController {
     @Request() request: RequestAuthenticated
   ): Promise<Entreprise[]> {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.entrepriseService.findEntreprisesByUserId(request.user.id)
+    return this.entreprisesService.findEntreprisesByUserId(request.user.id)
   }
 }

@@ -3,12 +3,12 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-import { EntrepriseToUser } from '../../entrepriseToUser/entity/entreprise-to-user.entity'
+import { Entreprise } from '../entreprises/entreprise.entity'
 
 export enum UserRole {
   ADMIN = 'ROLE_ADMIN',
@@ -26,8 +26,8 @@ export class User {
   @Column({ name: 'email', type: 'varchar', length: 255 })
   email: string
 
-  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
-  password: string | null
+  @Column({ type: 'varchar', length: 255, select: false })
+  password: string
 
   @Column({ type: 'varchar', length: 255 })
   firstName: string
@@ -41,6 +41,13 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatarUrl: string | null
 
+  @ManyToOne(() => Entreprise, (entreprise) => entreprise.users, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    nullable: true,
+  })
+  entreprise: Entreprise | null
+
   @Column({
     type: 'simple-array',
     enum: UserRole,
@@ -48,16 +55,6 @@ export class User {
     default: [UserRole.USER],
   })
   roles: UserRole[]
-
-  @OneToMany(
-    () => EntrepriseToUser,
-    (entrepriseToUser) => entrepriseToUser.user,
-    {
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    }
-  )
-  entrepriseToUsers: EntrepriseToUser[]
 
   @Column({
     type: 'varchar',

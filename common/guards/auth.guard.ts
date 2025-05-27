@@ -12,7 +12,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
-import { IS_PUBLIC_KEY } from 'common/decorator/auth.decorator'
+import { IS_PUBLIC_KEY } from 'common/decorators/auth.decorator'
 import { Request } from 'express'
 
 @Injectable()
@@ -21,13 +21,13 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private reflector: Reflector,
     private configService: ConfigService
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(
-      IS_PUBLIC_KEY,
-      [context.getHandler(), context.getClass()]
-    )
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ])
 
     if (isPublic) {
       return true

@@ -9,17 +9,17 @@ import {
   Request,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger'
-import { UserService } from './user.service'
+import { UsersService } from './users.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
-import { Public } from '../../common/decorator/auth.decorator'
+import { Public } from '../../common/decorators/auth.decorator'
 
 @ApiBearerAuth()
 @Controller('users')
-export class UserController {
-  private readonly logger = new Logger(UserController.name)
+export class UsersController {
+  private readonly logger = new Logger(UsersController.name)
 
-  constructor(private userService: UserService) {}
+  constructor(private usersService: UsersService) {}
 
   @Public()
   @Post('reset-password')
@@ -33,7 +33,7 @@ export class UserController {
     @Body() resetPasswordDto: ResetPasswordDto
   ) {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.userService.resetPassword(resetPasswordDto)
+    return this.usersService.resetPassword(resetPasswordDto)
   }
 
   @Public()
@@ -55,6 +55,6 @@ export class UserController {
     @Body() ResetPasswordConfirmDto: ResetPasswordConfirmDto
   ) {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.userService.resetPasswordConfirm(ResetPasswordConfirmDto)
+    return this.usersService.resetPasswordConfirm(ResetPasswordConfirmDto)
   }
 }

@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common'
 import { JwtModule } from '@nestjs/jwt'
 import authConfig from 'config/auth.config'
 import { AuthService } from './auth.service'
-import { AuthGuard } from '../../common/guard/auth.guard'
+import { AuthGuard } from '../../common/guards/auth.guard'
 import { AuthController } from './auth.controller'
-import { UserModule } from 'src/user/user.module'
+import { UsersModule } from 'src/users/users.module'
 import { APP_GUARD } from '@nestjs/core'
 
 @Module({
-  imports: [JwtModule.registerAsync(authConfig.asProvider()), UserModule],
+  imports: [JwtModule.registerAsync(authConfig.asProvider()), UsersModule],
   controllers: [AuthController],
   providers: [
     AuthService,

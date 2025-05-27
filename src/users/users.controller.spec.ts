@@ -1,20 +1,20 @@
 import { Test } from '@nestjs/testing'
-import { UserController } from './user.controller'
-import { UserService } from './user.service'
+import { UsersController } from './users.controller'
+import { UsersService } from './users.service'
 import * as httpMocks from 'node-mocks-http'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 
-describe('UserController', () => {
-  let userController: UserController
-  let userService: UserService
+describe('UsersController', () => {
+  let usersController: UsersController
+  let usersService: UsersService
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      controllers: [UserController],
+      controllers: [UsersController],
       providers: [
         {
-          provide: UserService,
+          provide: UsersService,
           useValue: {
             resetPassword: jest.fn().mockReturnValue('messageId'),
             resetPasswordConfirm: jest.fn().mockReturnValue({
@@ -26,12 +26,12 @@ describe('UserController', () => {
       ],
     }).compile()
 
-    userService = moduleRef.get(UserService)
-    userController = moduleRef.get(UserController)
+    usersService = moduleRef.get(UsersService)
+    usersController = moduleRef.get(UsersController)
   })
 
   it('shoulod be defined', () => {
-    expect(userController).toBeDefined()
+    expect(usersController).toBeDefined()
   })
 
   describe('resetPassword', () => {
@@ -49,10 +49,10 @@ describe('UserController', () => {
       }
 
       await expect(
-        userController.resetPassword(req, resetPasswordDto)
+        usersController.resetPassword(req, resetPasswordDto)
       ).resolves.toEqual('messageId')
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(userService.resetPassword).toHaveBeenCalledWith(resetPasswordDto)
+      expect(usersService.resetPassword).toHaveBeenCalledWith(resetPasswordDto)
     })
   })
 
@@ -73,13 +73,13 @@ describe('UserController', () => {
       }
 
       await expect(
-        userController.resetPasswordConfirm(req, resetPasswordConfirmDto)
+        usersController.resetPasswordConfirm(req, resetPasswordConfirmDto)
       ).resolves.toEqual({
         access_token: 'token',
         refresh_token: 'token',
       })
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(userService.resetPasswordConfirm).toHaveBeenCalledWith(
+      expect(usersService.resetPasswordConfirm).toHaveBeenCalledWith(
         resetPasswordConfirmDto
       )
     })

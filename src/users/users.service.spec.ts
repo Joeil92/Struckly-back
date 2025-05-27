@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
-import { UserService } from './user.service'
+import { UsersService } from './users.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { User, UserRole } from './entity/user.entity'
+import { User, UserRole } from './user.entity'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '../mailer/mailer.service'
@@ -15,17 +15,17 @@ const oneUser: User = {
   gender: 'male',
   avatarUrl: 'https://avatar.com',
   roles: [UserRole.USER],
-  entrepriseToUsers: [],
   password: '123456789',
   resetToken: 'resetToken',
   tokenExpiresAt: new Date('2025-05-23T00:00:00.000Z'),
+  entreprise: null,
   updatedAt: new Date('2025-05-23T00:00:00.000Z'),
   deletedAt: null,
   createdAt: new Date('2025-05-23T00:00:00.000Z'),
 }
 
-describe('UserService', () => {
-  let service: UserService
+describe('UsersService', () => {
+  let service: UsersService
   let mailerService: MailerService
 
   const mockQueryBuilder = {
@@ -38,7 +38,7 @@ describe('UserService', () => {
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
-        UserService,
+        UsersService,
         {
           provide: getRepositoryToken(User),
           useValue: {
@@ -71,7 +71,7 @@ describe('UserService', () => {
       ],
     }).compile()
 
-    service = module.get(UserService)
+    service = module.get(UsersService)
     mailerService = module.get(MailerService)
   })
 
@@ -136,33 +136,9 @@ describe('UserService', () => {
       expect(oneUser.tokenExpiresAt).toBeNull()
     })
 
-    it('should reset user password and generate tokens successfully without tokenExpiresAt', async () => {
-      jest.spyOn(service, 'findById').mockImplementation(() =>
-        Promise.resolve({
-          ...oneUser,
-          resetToken: 'resetToken',
-          tokenExpiresAt: null,
-        })
-      )
-
-      const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
-        token: 'resetToken',
-        userId: '1',
-        password: '123456789',
-      }
-
-      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
-
-      await expect(
-        service.resetPasswordConfirm(resetPasswordConfirmDto)
-      ).resolves.toEqual({ message: 'Password reset successfully' })
-      expect(oneUser.resetToken).toBeNull()
-      expect(oneUser.tokenExpiresAt).toBeNull()
-    })
-
     it('should throw an error if token is invalid', async () => {
       oneUser.resetToken = 'resetToken'
-      oneUser.tokenExpiresAt = new Date('2025-05-23T00:00:00.000Z')
+      oneUser.tokenExpiresAt = new Date(Date.now() + 1000)
 
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {
         token: 'notResetToken',
