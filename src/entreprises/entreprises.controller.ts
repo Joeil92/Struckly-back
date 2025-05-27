@@ -43,12 +43,12 @@ export class EntreprisesController {
   @Get('me')
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Successfully get entreprises',
+    description: 'Successfully get entreprise by user ID',
   })
   findByUserId(
     @Request() request: RequestAuthenticated
-  ): Promise<Entreprise[]> {
+  ): Promise<Entreprise | null> {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.entreprisesService.findEntreprisesByUserId(request.user.id)
+    return this.entreprisesService.findEntrepriseByUserId(request.user.id)
   }
 }

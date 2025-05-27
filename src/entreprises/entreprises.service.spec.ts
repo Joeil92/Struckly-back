@@ -33,7 +33,7 @@ describe('EntreprisesService', () => {
               leftJoin: jest.fn().mockReturnThis(),
               loadRelationCountAndMap: jest.fn().mockReturnThis(),
               where: jest.fn().mockReturnThis(),
-              getMany: jest.fn().mockResolvedValue([oneEntreprise]),
+              getOne: jest.fn().mockResolvedValue(oneEntreprise),
             }),
           },
         },
@@ -100,11 +100,11 @@ describe('EntreprisesService', () => {
   })
 
   describe('findEntreprisesByUserId()', () => {
-    it('should return an array of entreprises if userId exists', async () => {
+    it('should return entreprise if userId exists', async () => {
       const userId = '123456789'
-      await expect(service.findEntreprisesByUserId(userId)).resolves.toEqual([
-        oneEntreprise,
-      ])
+      await expect(service.findEntrepriseByUserId(userId)).resolves.toEqual(
+        oneEntreprise
+      )
     })
   })
 })
