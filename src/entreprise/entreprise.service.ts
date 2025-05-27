@@ -37,7 +37,7 @@ export class EntrepriseService {
   async findEntreprisesByUserId(userId: string): Promise<Entreprise[]> {
     return await this.entrepriseRepository
       .createQueryBuilder('entreprise')
-      .select(['entreprise.id', 'entreprise.name'])
+      .select(['entreprise.id', 'entreprise.name', 'entreprise.logoUrl'])
       .leftJoin('entreprise.entrepriseToUsers', 'entrepriseToUser')
       .loadRelationCountAndMap(
         'entreprise.membersCount',

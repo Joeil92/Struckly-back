@@ -13,6 +13,7 @@ export const entrepriseFactory = setSeederFactory(Entreprise, () => {
     const phoneNumber = faker.phone.number({ style: "international" });
     const email = faker.internet.email({ provider: name.replace(/\s/g, "") });
     const website = faker.internet.url();
+    const logo = faker.helpers.maybe(() => faker.image.url({ width: 100, height: 100 }), { probability: 0.8 }) ?? null;
 
     const entreprise = new Entreprise();
     entreprise.compagnyName = compagnyName;
@@ -25,6 +26,7 @@ export const entrepriseFactory = setSeederFactory(Entreprise, () => {
     entreprise.phoneNumber = phoneNumber;
     entreprise.email = email;
     entreprise.website = website;
+    entreprise.logoUrl = logo;
 
     return entreprise;
 })

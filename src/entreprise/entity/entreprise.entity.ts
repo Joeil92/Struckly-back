@@ -46,6 +46,9 @@ export class Entreprise {
   @Column({ type: 'varchar', length: 255, nullable: true })
   website: string | null
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  logoUrl: string | null
+
   @OneToMany(
     () => EntrepriseToUser,
     (entrepriseToUser) => entrepriseToUser.entreprise,
