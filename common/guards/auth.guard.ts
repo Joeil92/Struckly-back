@@ -12,7 +12,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import { Reflector } from '@nestjs/core'
 import { JwtService } from '@nestjs/jwt'
-import { IS_PUBLIC_KEY } from 'common/decorators/auth.decorator'
+import { IS_PUBLIC_KEY } from '../decorators/auth.decorator'
 import { Request } from 'express'
 
 @Injectable()
