@@ -21,7 +21,7 @@ import { AuthModule } from '../auth/auth.module'
     UsersService,
     {
       provide: APP_GUARD,
-      useExisting: RolesGuard,
+      useClass: RolesGuard,
     },
   ],
   exports: [UsersService],

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import authConfig from 'config/auth.config'
 import databaseConfig from 'config/database.config'
+import defaultConfig from 'config/configuration'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { HttpExceptionFilter } from 'common/exceptions/http-exception-filter'
 import mailerConfig from 'config/mailer.config'
@@ -14,7 +15,8 @@ import { InvitationsModule } from './invitations/invitations.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [authConfig, databaseConfig, mailerConfig],
+      envFilePath: `${process.cwd()}/config/env/.${process.env.NODE_ENV}.env`,
+      load: [defaultConfig, authConfig, databaseConfig, mailerConfig],
       isGlobal: true,
       cache: true,
     }),
