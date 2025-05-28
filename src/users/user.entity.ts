@@ -4,11 +4,13 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
 import { Entreprise } from '../entreprises/entreprise.entity'
+import { Invitation } from '../invitations/invitation.entity'
 
 export enum UserRole {
   ADMIN = 'ROLE_ADMIN',
@@ -66,6 +68,9 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   tokenExpiresAt: Date | null
+
+  @OneToMany(() => Invitation, (invitation) => invitation.sender)
+  invitations: Invitation[]
 
   @UpdateDateColumn()
   updatedAt: Date

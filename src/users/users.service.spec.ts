@@ -15,6 +15,7 @@ const oneUser: User = {
   gender: 'male',
   avatarUrl: 'https://avatar.com',
   roles: [UserRole.USER],
+  invitations: [],
   password: '123456789',
   resetToken: 'resetToken',
   tokenExpiresAt: new Date('2025-05-23T00:00:00.000Z'),

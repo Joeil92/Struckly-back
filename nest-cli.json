@@ -6,7 +6,7 @@
     "deleteOutDir": true,
     "assets": [
       {
-        "include": "template/*.pug",
+        "include": "templates/*.pug",
         "outDir": "dist/src",
         "watchAssets": true
       }

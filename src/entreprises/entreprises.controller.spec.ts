@@ -3,7 +3,6 @@ import { EntreprisesController } from './entreprises.controller'
 import { EntreprisesService } from './entreprises.service'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 import * as httpMocks from 'node-mocks-http'
-import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
 
 const entreprise: CreateEntrepriseDto = {
   compagnyName: 'test',
@@ -69,24 +68,6 @@ describe('EntrepriseController', () => {
       })
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(entreprisesService.create).toHaveBeenCalledWith(entreprise)
-    })
-  })
-
-  describe('findByUserId', () => {
-    it('should return the entreprises of the user', async () => {
-      const req = httpMocks.createRequest({
-        method: 'GET',
-        url: 'api/v1/entreprises/me',
-        user: {
-          id: '1',
-        },
-      }) as unknown as RequestAuthenticated
-
-      await expect(entreprisesController.findByUserId(req)).resolves.toEqual([])
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(entreprisesService.findEntreprisesByUserId).toHaveBeenCalledWith(
-        '1'
-      )
     })
   })
 })

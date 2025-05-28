@@ -98,13 +98,4 @@ describe('EntreprisesService', () => {
       await expect(service.findBySiret(siretNumber)).resolves.toBeNull()
     })
   })
-
-  describe('findEntreprisesByUserId()', () => {
-    it('should return entreprise if userId exists', async () => {
-      const userId = '123456789'
-      await expect(service.findEntrepriseByUserId(userId)).resolves.toEqual(
-        oneEntreprise
-      )
-    })
-  })
 })

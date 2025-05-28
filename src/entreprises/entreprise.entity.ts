@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 import { User } from '../users/user.entity'
+import { Invitation } from '../invitations/invitation.entity'
 
 @Entity('Entreprises')
 @Unique(['siretNumber', 'slug'])
@@ -54,6 +55,9 @@ export class Entreprise {
 
   @OneToMany(() => User, (user) => user.entreprise)
   users: User[]
+
+  @OneToMany(() => Invitation, (invitation) => invitation.entreprise)
+  invitations: Invitation[]
 
   @UpdateDateColumn()
   updatedAt: Date

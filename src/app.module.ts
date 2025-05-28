@@ -9,6 +9,7 @@ import { MailerModule } from './mailer/mailer.module'
 import { AuthModule } from './auth/auth.module'
 import { EntreprisesModule } from './entreprises/entreprises.module'
 import { UsersModule } from './users/users.module'
+import { InvitationsModule } from './invitations/invitations.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UsersModule } from './users/users.module'
     AuthModule,
     EntreprisesModule,
     UsersModule,
+    InvitationsModule,
   ],
   controllers: [],
   providers: [
