@@ -34,6 +34,12 @@ const invitationDto: CreateInvitationDto = {
 describe('InvitationsService', () => {
   let service: InvitationsService
 
+  const mockInvitationRepository = {
+    save: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+  }
+
   const mockUserRepository = {
     findOne: jest.fn(),
   }
@@ -48,10 +54,7 @@ describe('InvitationsService', () => {
         },
         {
           provide: getRepositoryToken(Invitation),
-          useValue: {
-            save: jest.fn().mockResolvedValue([oneInvitation]),
-            find: jest.fn().mockResolvedValue([oneInvitation]),
-          },
+          useValue: mockInvitationRepository,
         },
         {
           provide: MailerService,
@@ -80,6 +83,8 @@ describe('InvitationsService', () => {
 
     it('should send invitations', async () => {
       mockUserRepository.findOne.mockResolvedValue(oneInvitation.sender)
+      mockInvitationRepository.save.mockResolvedValue([oneInvitation])
+      mockInvitationRepository.find.mockResolvedValue([oneInvitation])
 
       const invitation = {
         id: oneInvitation.id,
@@ -115,6 +120,35 @@ describe('InvitationsService', () => {
       await expect(
         service.create(invitationDto, oneInvitation.sender.id)
       ).rejects.toThrow('User has no company')
+    })
+  })
+
+  describe('checkAndConfirmInvitation', () => {
+    it('should confirm and return invitation', async () => {
+      mockInvitationRepository.findOne.mockResolvedValue(oneInvitation)
+      mockInvitationRepository.save.mockResolvedValue(oneInvitation)
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
+      await expect(
+        service.checkAndConfirmInvitation('test@test.com', '123456789')
+      ).resolves.toEqual(oneInvitation)
+    })
+
+    it('should throw an error if invitation not found', async () => {
+      mockInvitationRepository.findOne.mockResolvedValue(null)
+
+      await expect(
+        service.checkAndConfirmInvitation('test@test.com', '123456789')
+      ).rejects.toThrow('Invitation not found')
+    })
+
+    it('should throw an error if token is invalid', async () => {
+      mockInvitationRepository.findOne.mockResolvedValue(oneInvitation)
+
+      jest.spyOn(bcrypt, 'compare').mockImplementation(() => false)
+
+      await expect(
+        service.checkAndConfirmInvitation('test@test.com', '123456789')
+      ).rejects.toThrow('Invalid token')
     })
   })
 })

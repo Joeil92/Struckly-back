@@ -13,6 +13,7 @@ import { UsersService } from './users.service'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
 import { Public } from '../../common/decorators/auth.decorator'
+import { CreateUserDto } from './dto/create-user.dto'
 
 @ApiBearerAuth()
 @Controller('users')
@@ -20,6 +21,21 @@ export class UsersController {
   private readonly logger = new Logger(UsersController.name)
 
   constructor(private usersService: UsersService) {}
+
+  @Public()
+  @Post()
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully create user',
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Email already exists',
+  })
+  create(@Request() request: Request, @Body() userDto: CreateUserDto) {
+    this.logger.log(`${request.method} ${request.url}`)
+    return this.usersService.create(userDto)
+  }
 
   @Public()
   @Post('reset-password')

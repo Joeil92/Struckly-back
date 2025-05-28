@@ -4,6 +4,7 @@ import { UsersService } from './users.service'
 import * as httpMocks from 'node-mocks-http'
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ResetPasswordDto } from './dto/reset-password.dto'
+import { CreateUserDto } from './dto/create-user.dto'
 
 describe('UsersController', () => {
   let usersController: UsersController
@@ -16,7 +17,11 @@ describe('UsersController', () => {
         {
           provide: UsersService,
           useValue: {
-            resetPassword: jest.fn().mockReturnValue('messageId'),
+            create: jest.fn().mockReturnValue({
+              access_token: 'token',
+              refresh_token: 'token',
+            }),
+            resetPassword: jest.fn(),
             resetPasswordConfirm: jest.fn().mockReturnValue({
               access_token: 'token',
               refresh_token: 'token',
@@ -34,23 +39,43 @@ describe('UsersController', () => {
     expect(usersController).toBeDefined()
   })
 
+  describe('create', () => {
+    it('should create a user and return auth tokens', () => {
+      const req: Request = httpMocks.createRequest({
+        method: 'POST',
+        url: 'api/v1/users',
+      })
+
+      const createUserDto: CreateUserDto = {
+        email: 'john.doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: '123456789',
+        gender: 'male',
+      }
+
+      expect(usersController.create(req, createUserDto)).toEqual({
+        access_token: 'token',
+        refresh_token: 'token',
+      })
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(usersService.create).toHaveBeenCalledWith(createUserDto)
+    })
+  })
+
   describe('resetPassword', () => {
     it('should return a messageId', async () => {
       const req: Request = httpMocks.createRequest({
         method: 'POST',
         url: 'api/v1/users/reset-password',
-        user: {
-          id: 1,
-        },
       })
 
       const resetPasswordDto: ResetPasswordDto = {
         email: 'john.doe@gmail.com',
       }
 
-      await expect(
-        usersController.resetPassword(req, resetPasswordDto)
-      ).resolves.toEqual('messageId')
+      await usersController.resetPassword(req, resetPasswordDto)
+
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(usersService.resetPassword).toHaveBeenCalledWith(resetPasswordDto)
     })
@@ -61,9 +86,6 @@ describe('UsersController', () => {
       const req: Request = httpMocks.createRequest({
         method: 'PATCH',
         url: 'api/v1/users/reset-password/confirm',
-        user: {
-          id: 1,
-        },
       })
 
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { Test } from '@nestjs/testing'
 import { UsersService } from './users.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
@@ -6,6 +8,10 @@ import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto'
 import { ConfigService } from '@nestjs/config'
 import { MailerService } from '../mailer/mailer.service'
 import * as bcrypt from 'bcrypt'
+import { AuthService } from '../auth/auth.service'
+import { InvitationsService } from '../invitations/invitations.service'
+import { InvitationStatus } from '../invitations/invitation.entity'
+import { CreateUserDto } from './dto/create-user.dto'
 
 const oneUser: User = {
   id: '1',
@@ -28,6 +34,7 @@ const oneUser: User = {
 describe('UsersService', () => {
   let service: UsersService
   let mailerService: MailerService
+  let invitationsService: InvitationsService
 
   const mockQueryBuilder = {
     addSelect: jest.fn().mockReturnThis(),
@@ -64,6 +71,25 @@ describe('UsersService', () => {
           },
         },
         {
+          provide: AuthService,
+          useValue: {
+            generateTokens: jest.fn().mockReturnValue({
+              access_token: 'token',
+              refresh_token: 'token',
+            }),
+          },
+        },
+        {
+          provide: InvitationsService,
+          useValue: {
+            checkAndConfirmInvitation: jest.fn().mockReturnValue({
+              id: 1,
+              entreprise: {},
+              status: InvitationStatus.VALIDATED,
+            }),
+          },
+        },
+        {
           provide: ConfigService,
           useValue: {
             get: jest.fn().mockReturnValue(10),
@@ -74,10 +100,69 @@ describe('UsersService', () => {
 
     service = module.get(UsersService)
     mailerService = module.get(MailerService)
+    invitationsService = module.get(InvitationsService)
   })
 
   it('should be defined', () => {
     expect(service).toBeDefined()
+  })
+
+  describe('create', () => {
+    it('should create a user and return auth tokens', async () => {
+      const createUserDto: CreateUserDto = {
+        email: 'john.not-doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: '123456789',
+        gender: 'male',
+      }
+
+      await expect(service.create(createUserDto)).resolves.toEqual({
+        access_token: 'token',
+        refresh_token: 'token',
+      })
+
+      expect(
+        invitationsService.checkAndConfirmInvitation
+      ).not.toHaveBeenCalled()
+    })
+
+    it('should create a user with invitation token', async () => {
+      const createUserDto: CreateUserDto = {
+        email: 'john.not-doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: '123456789',
+        gender: 'male',
+        invitationToken: '123456789',
+      }
+
+      await expect(service.create(createUserDto)).resolves.toEqual({
+        access_token: 'token',
+        refresh_token: 'token',
+      })
+
+      expect(invitationsService.checkAndConfirmInvitation).toHaveBeenCalledWith(
+        createUserDto.email,
+        createUserDto.invitationToken
+      )
+    })
+
+    it('should throw an error if email already exists', async () => {
+      const createUserDto: CreateUserDto = {
+        email: 'john.doe@gmail.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        password: '123456789',
+        gender: 'male',
+      }
+
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(oneUser))
+
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        'Email already exists'
+      )
+    })
   })
 
   describe('findByEmail()', () => {
@@ -105,7 +190,7 @@ describe('UsersService', () => {
       await expect(
         service.resetPassword({ email: 'john.doe@gmail.com' })
       ).resolves.toBeUndefined()
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(mailerService.sendMail).toHaveBeenCalled()
     })
 
@@ -115,7 +200,7 @@ describe('UsersService', () => {
       await expect(
         service.resetPassword({ email: 'john.not-doe@gmail.com' })
       ).resolves.toBeUndefined()
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+
       expect(mailerService.sendMail).not.toHaveBeenCalled()
     })
   })

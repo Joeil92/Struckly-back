@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from './user.entity'
 import { Repository } from 'typeorm'
@@ -9,15 +15,51 @@ import { ResetPasswordDto } from './dto/reset-password.dto'
 import { MailerService } from '../mailer/mailer.service'
 import * as crypto from 'crypto'
 import { SendMailDto } from '../mailer/dto/send-mail.dto'
+import { CreateUserDto } from './dto/create-user.dto'
+import { InvitationsService } from '../invitations/invitations.service'
+import { AuthService } from '../auth/auth.service'
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService,
     private mailerService: MailerService,
+    private invitationsService: InvitationsService,
     private configService: ConfigService
   ) {}
+
+  async create(userDto: CreateUserDto) {
+    const userByEmail = await this.findByEmail(userDto.email)
+    if (userByEmail) {
+      throw new HttpException('Email already exists', HttpStatus.CONFLICT)
+    }
+
+    const user = new User()
+    user.email = userDto.email
+    user.firstName = userDto.firstName
+    user.lastName = userDto.lastName
+    user.gender = userDto.gender
+    user.password = await bcrypt.hash(
+      userDto.password,
+      Number(this.configService.get<number>('SALT_ROUNDS'))
+    )
+
+    if (userDto.invitationToken) {
+      const invitation =
+        await this.invitationsService.checkAndConfirmInvitation(
+          userDto.email,
+          userDto.invitationToken
+        )
+      user.entreprise = invitation.entreprise
+    }
+
+    const userSaved = await this.userRepository.save(user)
+
+    return this.authService.generateTokens(userSaved)
+  }
 
   async findByEmail(email: string): Promise<User | null> {
     return await this.userRepository

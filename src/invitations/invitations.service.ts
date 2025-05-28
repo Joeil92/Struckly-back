@@ -85,4 +85,27 @@ export class InvitationsService {
       createdAt: invitation.createdAt,
     }))
   }
+
+  async checkAndConfirmInvitation(
+    email: string,
+    token: string
+  ): Promise<Invitation> {
+    const invitation = await this.invitationRepository.findOne({
+      where: { email, token },
+      relations: ['sender', 'entreprise'],
+    })
+
+    if (!invitation) {
+      throw new HttpException('Invitation not found', HttpStatus.NOT_FOUND)
+    }
+
+    const isValid = await bcrypt.compare(token, invitation.token)
+    if (!isValid) {
+      throw new HttpException('Invalid token', HttpStatus.BAD_REQUEST)
+    }
+
+    invitation.status = InvitationStatus.VALIDATED
+    invitation.validatedAt = new Date()
+    return await this.invitationRepository.save(invitation)
+  }
 }

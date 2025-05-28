@@ -10,5 +10,6 @@ import { MailerModule } from '../mailer/mailer.module'
   imports: [TypeOrmModule.forFeature([Invitation, User]), MailerModule],
   controllers: [InvitationsController],
   providers: [InvitationsService],
+  exports: [InvitationsService],
 })
 export class InvitationsModule {}
