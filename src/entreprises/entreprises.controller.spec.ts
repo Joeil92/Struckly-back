@@ -3,6 +3,7 @@ import { EntreprisesController } from './entreprises.controller'
 import { EntreprisesService } from './entreprises.service'
 import { CreateEntrepriseDto } from './dto/create-entreprise'
 import * as httpMocks from 'node-mocks-http'
+import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
 
 const entreprise: CreateEntrepriseDto = {
   compagnyName: 'test',
@@ -34,9 +35,11 @@ describe('EntrepriseController', () => {
               .mockImplementation((entreprise: CreateEntrepriseDto) =>
                 Promise.resolve({ id: 1, ...entreprise })
               ),
-            findEntreprisesByUserId: jest
+            findByUserId: jest
               .fn()
-              .mockImplementation(() => Promise.resolve([])),
+              .mockImplementation(() =>
+                Promise.resolve({ id: 1, ...entreprise })
+              ),
           },
         },
       ],
@@ -68,6 +71,25 @@ describe('EntrepriseController', () => {
       })
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(entreprisesService.create).toHaveBeenCalledWith(entreprise)
+    })
+  })
+
+  describe('findByUserId', () => {
+    it('should return an entreprise if user exists', async () => {
+      const req: RequestAuthenticated = httpMocks.createRequest({
+        method: 'GET',
+        url: 'api/v1/entreprises/me',
+        user: {
+          id: '1',
+        },
+      })
+
+      await expect(entreprisesController.findByUserId(req)).resolves.toEqual({
+        id: 1,
+        ...entreprise,
+      })
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(entreprisesService.findByUserId).toHaveBeenCalledWith(req.user.id)
     })
   })
 })

@@ -49,6 +49,6 @@ export class EntreprisesController {
     @Request() request: RequestAuthenticated
   ): Promise<Entreprise | null> {
     this.logger.log(`${request.method} ${request.url}`)
-    return this.entreprisesService.findEntrepriseByUserId(request.user.id)
+    return this.entreprisesService.findByUserId(request.user.id)
   }
 }

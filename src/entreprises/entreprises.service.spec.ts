@@ -13,6 +13,14 @@ const oneEntreprise = {
 describe('EntreprisesService', () => {
   let service: EntreprisesService
 
+  const mockQueryBuilder = {
+    select: jest.fn().mockReturnThis(),
+    leftJoin: jest.fn().mockReturnThis(),
+    loadRelationCountAndMap: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    getOne: jest.fn().mockResolvedValue(oneEntreprise),
+  }
+
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -28,13 +36,7 @@ describe('EntreprisesService', () => {
                   siretNumber === '123456789' ? oneEntreprise : null
                 )
               ),
-            createQueryBuilder: jest.fn().mockReturnValue({
-              select: jest.fn().mockReturnThis(),
-              leftJoin: jest.fn().mockReturnThis(),
-              loadRelationCountAndMap: jest.fn().mockReturnThis(),
-              where: jest.fn().mockReturnThis(),
-              getOne: jest.fn().mockResolvedValue(oneEntreprise),
-            }),
+            createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
           },
         },
       ],
@@ -96,6 +98,22 @@ describe('EntreprisesService', () => {
     it('should return null if not found', async () => {
       const siretNumber = '12345678910'
       await expect(service.findBySiret(siretNumber)).resolves.toBeNull()
+    })
+  })
+
+  describe('findEntrepriseByUserId()', () => {
+    it('should return an entreprise if user exists', async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(oneEntreprise))
+
+      const userId = '1'
+      await expect(service.findByUserId(userId)).resolves.toEqual(oneEntreprise)
+    })
+
+    it('should return null if not found', async () => {
+      mockQueryBuilder.getOne.mockReturnValue(Promise.resolve(null))
+
+      const userId = '1'
+      await expect(service.findByUserId(userId)).resolves.toBeNull()
     })
   })
 })
