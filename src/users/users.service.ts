@@ -42,10 +42,7 @@ export class UsersService {
     user.firstName = userDto.firstName
     user.lastName = userDto.lastName
     user.gender = userDto.gender
-    user.password = await bcrypt.hash(
-      userDto.password,
-      Number(this.configService.get<number>('SALT_ROUNDS'))
-    )
+    user.password = userDto.password
 
     if (userDto.invitationToken) {
       const invitation =
@@ -85,11 +82,7 @@ export class UsersService {
     }
 
     const token = crypto.randomBytes(32).toString('hex')
-    const hash = await bcrypt.hash(
-      token,
-      Number(this.configService.get<number>('SALT_ROUNDS'))
-    )
-    user.resetToken = hash
+    user.resetToken = token
     user.tokenExpiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000) // 2 hours expiration
 
     const mailOptions: SendMailDto = {
@@ -128,10 +121,7 @@ export class UsersService {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
     }
 
-    user.password = await bcrypt.hash(
-      resetPasswordDto.password,
-      Number(this.configService.get<number>('SALT_ROUNDS'))
-    )
+    user.password = resetPasswordDto.password
     user.resetToken = null
     user.tokenExpiresAt = null
     await this.userRepository.save(user)

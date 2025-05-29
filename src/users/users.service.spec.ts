@@ -13,23 +13,20 @@ import { InvitationsService } from '../invitations/invitations.service'
 import { InvitationStatus } from '../invitations/invitation.entity'
 import { CreateUserDto } from './dto/create-user.dto'
 
-const oneUser: User = {
-  id: '1',
-  email: 'john.doe@gmail.com',
-  firstName: 'John',
-  lastName: 'Doe',
-  gender: 'male',
-  avatarUrl: 'https://avatar.com',
-  roles: [UserRole.USER],
-  invitations: [],
-  password: '123456789',
-  resetToken: 'resetToken',
-  tokenExpiresAt: new Date('2025-05-23T00:00:00.000Z'),
-  entreprise: null,
-  updatedAt: new Date('2025-05-23T00:00:00.000Z'),
-  deletedAt: null,
-  createdAt: new Date('2025-05-23T00:00:00.000Z'),
-}
+const oneUser = new User()
+oneUser.email = 'john.doe@gmail.com'
+oneUser.firstName = 'John'
+oneUser.lastName = 'Doe'
+oneUser.gender = 'male'
+oneUser.avatarUrl = 'https://avatar.com'
+oneUser.roles = [UserRole.USER]
+oneUser.password = '123456789'
+oneUser.resetToken = 'resetToken'
+oneUser.tokenExpiresAt = new Date('2025-05-23T00:00:00.000Z')
+oneUser.entreprise = null
+oneUser.updatedAt = new Date('2025-05-23T00:00:00.000Z')
+oneUser.deletedAt = null
+oneUser.createdAt = new Date('2025-05-23T00:00:00.000Z')
 
 describe('UsersService', () => {
   let service: UsersService
@@ -252,13 +249,9 @@ describe('UsersService', () => {
     })
 
     it('should throw an error if token has expired', async () => {
-      jest.spyOn(service, 'findById').mockImplementation(() =>
-        Promise.resolve({
-          ...oneUser,
-          tokenExpiresAt: new Date(Date.now() - 1000),
-        })
-      )
+      oneUser.tokenExpiresAt = new Date(Date.now() - 1000)
 
+      jest.spyOn(service, 'findById').mockResolvedValue(oneUser)
       jest.spyOn(bcrypt, 'compare').mockImplementation(() => true)
 
       const resetPasswordConfirmDto: ResetPasswordConfirmDto = {

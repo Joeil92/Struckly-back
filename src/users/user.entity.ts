@@ -1,4 +1,5 @@
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -11,6 +12,7 @@ import {
 } from 'typeorm'
 import { Entreprise } from '../entreprises/entreprise.entity'
 import { Invitation } from '../invitations/invitation.entity'
+import * as bcrypt from 'bcrypt'
 
 export enum UserRole {
   ADMIN = 'ROLE_ADMIN',
@@ -80,4 +82,18 @@ export class User {
 
   @CreateDateColumn()
   createdAt: Date
+
+  @BeforeInsert()
+  setPassword(password: string) {
+    const salt = bcrypt.genSaltSync()
+    this.password = bcrypt.hashSync(password || this.password, salt)
+  }
+
+  @BeforeInsert()
+  setResetToken(token: string) {
+    if (!this.resetToken) return
+
+    const salt = bcrypt.genSaltSync()
+    this.resetToken = bcrypt.hashSync(token || this.resetToken, salt)
+  }
 }
