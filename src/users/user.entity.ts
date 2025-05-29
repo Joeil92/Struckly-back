@@ -86,14 +86,14 @@ export class User {
   @BeforeInsert()
   setPassword(password: string) {
     const salt = bcrypt.genSaltSync()
-    this.password = bcrypt.hashSync(password || this.password, salt)
+    this.password = bcrypt.hashSync(this.password || password, salt)
   }
 
   @BeforeInsert()
   setResetToken(token: string) {
-    if (!this.resetToken) return
+    if (!this.resetToken || !token) return
 
     const salt = bcrypt.genSaltSync()
-    this.resetToken = bcrypt.hashSync(token || this.resetToken, salt)
+    this.resetToken = bcrypt.hashSync(this.resetToken || token, salt)
   }
 }
