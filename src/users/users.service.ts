@@ -121,7 +121,7 @@ export class UsersService {
       throw new HttpException('Invalid payload', HttpStatus.BAD_REQUEST)
     }
 
-    user.password = resetPasswordDto.password
+    user.setPassword(resetPasswordDto.password)
     user.resetToken = null
     user.tokenExpiresAt = null
     await this.userRepository.save(user)

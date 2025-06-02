@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -92,9 +93,9 @@ export class User {
     this.password = bcrypt.hashSync(this.password || password, salt)
   }
 
-  @BeforeInsert()
+  @BeforeUpdate()
   setResetToken(token: string) {
-    if (!this.resetToken || !token) return
+    if (!this.resetToken && !token) return
 
     const salt = bcrypt.genSaltSync()
     this.resetToken = bcrypt.hashSync(this.resetToken || token, salt)
