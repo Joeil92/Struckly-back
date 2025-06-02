@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
@@ -11,9 +12,9 @@ import {
 import { User } from '../users/user.entity'
 import { Invitation } from '../invitations/invitation.entity'
 
-@Entity('Entreprises')
-@Unique(['siretNumber', 'slug'])
-export class Entreprise {
+@Entity('Organizations')
+@Unique(['slug'])
+export class Organization {
   @PrimaryGeneratedColumn()
   id: number
 
@@ -21,31 +22,25 @@ export class Entreprise {
   slug: string
 
   @Column({ type: 'varchar', length: 255 })
-  compagnyName: string
-
-  @Column({ type: 'varchar', length: 255 })
   name: string
 
   @Column({ type: 'varchar', length: 255 })
   country: string
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   address: string
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   city: string
 
-  @Column({ type: 'varchar', length: 10 })
+  @Column({ type: 'varchar', length: 10, nullable: true })
   postalCode: string
 
-  @Column({ type: 'varchar', length: 14 })
-  siretNumber: string
-
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   phoneNumber: string
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  email: string | null
+  @ManyToOne(() => User, (user) => user.ownerOrganizations)
+  owner: User
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   website: string | null
@@ -53,10 +48,10 @@ export class Entreprise {
   @Column({ type: 'varchar', length: 255, nullable: true })
   logoUrl: string | null
 
-  @OneToMany(() => User, (user) => user.entreprise)
+  @OneToMany(() => User, (user) => user.organization)
   users: User[]
 
-  @OneToMany(() => Invitation, (invitation) => invitation.entreprise)
+  @OneToMany(() => Invitation, (invitation) => invitation.organization)
   invitations: Invitation[]
 
   @UpdateDateColumn()

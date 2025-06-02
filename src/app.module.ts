@@ -8,7 +8,7 @@ import { HttpExceptionFilter } from '../common/exceptions/http-exception-filter'
 import mailerConfig from '../config/mailer.config'
 import { MailerModule } from './mailer/mailer.module'
 import { AuthModule } from './auth/auth.module'
-import { EntreprisesModule } from './entreprises/entreprises.module'
+import { OrganizationsModule } from './organizations/organizations.module'
 import { UsersModule } from './users/users.module'
 import { InvitationsModule } from './invitations/invitations.module'
 
@@ -23,7 +23,7 @@ import { InvitationsModule } from './invitations/invitations.module'
     TypeOrmModule.forRootAsync(databaseConfig.asProvider()),
     MailerModule,
     AuthModule,
-    EntreprisesModule,
+    OrganizationsModule,
     UsersModule,
     InvitationsModule,
   ],

@@ -50,7 +50,7 @@ export class UsersService {
           userDto.email,
           userDto.invitationToken
         )
-      user.entreprise = invitation.entreprise
+      user.organization = invitation.organization
     }
 
     const userSaved = await this.userRepository.save(user)

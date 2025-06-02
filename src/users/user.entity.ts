@@ -10,7 +10,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm'
-import { Entreprise } from '../entreprises/entreprise.entity'
+import { Organization } from '../organizations/organization.entity'
 import { Invitation } from '../invitations/invitation.entity'
 import * as bcrypt from 'bcrypt'
 
@@ -45,12 +45,15 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: true })
   avatarUrl: string | null
 
-  @ManyToOne(() => Entreprise, (entreprise) => entreprise.users, {
+  @ManyToOne(() => Organization, (organization) => organization.users, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
     nullable: true,
   })
-  entreprise: Entreprise | null
+  organization: Organization | null
+
+  @OneToMany(() => Organization, (organization) => organization.owner)
+  ownerOrganizations: Organization[]
 
   @Column({
     type: 'simple-array',

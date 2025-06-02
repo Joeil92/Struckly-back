@@ -23,13 +23,13 @@ export class InvitationsService {
   async create({ emails }: CreateInvitationDto, senderId: string) {
     const user = await this.userRepository.findOne({
       where: { id: senderId },
-      relations: ['entreprise'],
+      relations: ['organization'],
     })
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
 
-    if (!user.entreprise) {
+    if (!user.organization) {
       throw new HttpException('User has no company', HttpStatus.BAD_REQUEST)
     }
 
@@ -68,7 +68,7 @@ export class InvitationsService {
       const invitation = new Invitation()
       invitation.email = email
       invitation.token = hash
-      invitation.entreprise = user.entreprise!
+      invitation.organization = user.organization!
       invitation.sender = user
       invitation.status = InvitationStatus.PENDING
 
@@ -92,7 +92,7 @@ export class InvitationsService {
   ): Promise<Invitation> {
     const invitation = await this.invitationRepository.findOne({
       where: { email, token },
-      relations: ['sender', 'entreprise'],
+      relations: ['sender', 'organization'],
     })
 
     if (!invitation) {

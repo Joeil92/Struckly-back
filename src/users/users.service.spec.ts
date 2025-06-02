@@ -23,7 +23,7 @@ oneUser.roles = [UserRole.USER]
 oneUser.password = '123456789'
 oneUser.resetToken = 'resetToken'
 oneUser.tokenExpiresAt = new Date('2025-05-23T00:00:00.000Z')
-oneUser.entreprise = null
+oneUser.organization = null
 oneUser.updatedAt = new Date('2025-05-23T00:00:00.000Z')
 oneUser.deletedAt = null
 oneUser.createdAt = new Date('2025-05-23T00:00:00.000Z')
@@ -81,7 +81,7 @@ describe('UsersService', () => {
           useValue: {
             checkAndConfirmInvitation: jest.fn().mockReturnValue({
               id: 1,
-              entreprise: {},
+              organization: {},
               status: InvitationStatus.VALIDATED,
             }),
           },

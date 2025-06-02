@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { InvitationsService } from './invitations.service'
 import { Invitation, InvitationStatus } from './invitation.entity'
-import { Entreprise } from '../entreprises/entreprise.entity'
+import { Organization } from '../organizations/organization.entity'
 import { User } from '../users/user.entity'
 import { MailerService } from '../mailer/mailer.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
@@ -13,13 +13,13 @@ const oneInvitation: Invitation = {
   id: 1,
   sender: {
     id: '1',
-    entreprise: {
+    organization: {
       id: 1,
     },
   } as User,
-  entreprise: {
+  organization: {
     id: 1,
-  } as Entreprise,
+  } as Organization,
   email: 'test@test.com',
   token: '123456789',
   status: InvitationStatus.PENDING,
@@ -100,7 +100,7 @@ describe('InvitationsService', () => {
       )
 
       expect(create).toEqual([invitation])
-      expect(create).not.toHaveProperty(['token', 'sender', 'entreprise'])
+      expect(create).not.toHaveProperty(['token', 'sender', 'organization'])
     })
 
     it('should throw an error if sender does not exist', async () => {
@@ -114,7 +114,7 @@ describe('InvitationsService', () => {
     it('should throw an error if sender has no company', async () => {
       mockUserRepository.findOne.mockResolvedValue({
         ...oneInvitation.sender,
-        entreprise: null,
+        organization: null,
       })
 
       await expect(

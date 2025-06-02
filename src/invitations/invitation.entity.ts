@@ -7,7 +7,7 @@ import {
   Unique,
 } from 'typeorm'
 import { User } from '../users/user.entity'
-import { Entreprise } from '../entreprises/entreprise.entity'
+import { Organization } from '../organizations/organization.entity'
 
 export enum InvitationStatus {
   PENDING = 'PENDING',
@@ -29,8 +29,8 @@ export class Invitation {
   @Column({ type: 'varchar', length: 255 })
   token: string
 
-  @ManyToOne(() => Entreprise, (entreprise) => entreprise.invitations)
-  entreprise: Entreprise
+  @ManyToOne(() => Organization, (organization) => organization.invitations)
+  organization: Organization
 
   @Column({ type: 'timestamp', nullable: true, default: null })
   validatedAt: Date | null

@@ -3,7 +3,7 @@ import { runSeeders, SeederOptions } from 'typeorm-extension'
 import * as dotenv from 'dotenv'
 import { MainSeeder } from './main.seeder'
 import { userFactory } from './factory/user.factory'
-import { entrepriseFactory } from './factory/entreprise.factory'
+import { organizationFactory } from './factory/organization.factory'
 
 dotenv.config({ path: `${process.cwd()}/config/env/.${process.env.NODE_ENV}.env` })
   ; (async () => {
@@ -23,7 +23,7 @@ dotenv.config({ path: `${process.cwd()}/config/env/.${process.env.NODE_ENV}.env`
       database: process.env.POSTGRES_DB,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       seeds: [MainSeeder],
-      factories: [userFactory, entrepriseFactory],
+      factories: [userFactory, organizationFactory],
       synchronize: true,
     }
 

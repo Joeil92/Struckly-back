@@ -6,7 +6,7 @@ import * as httpMocks from 'node-mocks-http'
 import { Invitation, InvitationStatus } from './invitation.entity'
 import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
 import { User } from '../users/user.entity'
-import { Entreprise } from '../entreprises/entreprise.entity'
+import { Organization } from '../organizations/organization.entity'
 
 const invitationsDto: CreateInvitationDto = {
   emails: ['test@test.com', 'test2@test.com'],
@@ -17,9 +17,9 @@ const invitation: Invitation = {
   sender: {
     id: '1',
   } as User,
-  entreprise: {
+  organization: {
     id: 1,
-  } as Entreprise,
+  } as Organization,
   email: 'test@test.com',
   token: '123456789',
   status: InvitationStatus.PENDING,
@@ -66,7 +66,7 @@ describe('InvitationsController', () => {
 
     it('should send invitations', async () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { token, entreprise, ...invitations } = invitation
+      const { token, organization, ...invitations } = invitation
 
       mockService.create.mockResolvedValue([invitations])
 
