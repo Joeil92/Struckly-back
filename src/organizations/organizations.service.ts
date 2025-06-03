@@ -55,11 +55,6 @@ export class OrganizationsService {
   async findByUserId(userId: string): Promise<Organization | null> {
     return await this.organizationRepository
       .createQueryBuilder('organization')
-      .select([
-        'organization.slug',
-        'organization.name',
-        'organization.logoUrl',
-      ])
       .leftJoin('organization.users', 'users')
       .loadRelationCountAndMap(
         'organization.membersCount',
