@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsString, Length } from 'class-validator'
+import { IsEnum, IsString, Length } from 'class-validator'
+import { OrganizationSize } from '../organization.types'
 
 export class CreateOrganizationDto {
   @IsString()
@@ -23,4 +24,13 @@ export class CreateOrganizationDto {
     example: 'France',
   })
   country: string
+
+  @IsEnum(OrganizationSize)
+  @ApiProperty({
+    type: String,
+    enum: OrganizationSize,
+    description: 'Organization size',
+    example: OrganizationSize['1-9'],
+  })
+  size: OrganizationSize
 }

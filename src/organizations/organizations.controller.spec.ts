@@ -6,6 +6,7 @@ import * as httpMocks from 'node-mocks-http'
 import { RequestAuthenticated } from '../../common/types/requestAuthenticated.interface'
 import { Organization } from './organization.entity'
 import { User } from '../users/user.entity'
+import { OrganizationSize } from './organization.types'
 
 const oneOrganization = new Organization()
 oneOrganization.id = 1
@@ -54,6 +55,7 @@ describe('OrganizationController', () => {
       const organization: CreateOrganizationDto = {
         name: 'test',
         country: 'France',
+        size: OrganizationSize['1-9'],
       }
 
       const req: RequestAuthenticated = httpMocks.createRequest({

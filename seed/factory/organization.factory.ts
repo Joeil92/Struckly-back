@@ -1,6 +1,7 @@
 import { setSeederFactory } from 'typeorm-extension'
 import { Organization } from '../../src/organizations/organization.entity'
 import { faker } from '@faker-js/faker'
+import { OrganizationSize } from '../../src/organizations/organization.types'
 
 export const organizationFactory = setSeederFactory(Organization, () => {
   const name = faker.company.name()
@@ -19,6 +20,7 @@ export const organizationFactory = setSeederFactory(Organization, () => {
   const organization = new Organization()
   organization.slug = slug
   organization.name = name
+  organization.size = OrganizationSize['1-9']
   organization.country = country
   organization.address = address
   organization.city = city

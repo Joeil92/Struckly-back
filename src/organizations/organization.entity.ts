@@ -11,6 +11,7 @@ import {
 } from 'typeorm'
 import { User } from '../users/user.entity'
 import { Invitation } from '../invitations/invitation.entity'
+import { OrganizationSize } from './organization.types'
 
 @Entity('Organizations')
 @Unique(['slug'])
@@ -38,6 +39,12 @@ export class Organization {
 
   @Column({ type: 'varchar', length: 20, nullable: true })
   phoneNumber: string
+
+  @Column({
+    type: 'enum',
+    enum: OrganizationSize,
+  })
+  size: OrganizationSize
 
   @ManyToOne(() => User, (user) => user.ownerOrganizations)
   owner: User

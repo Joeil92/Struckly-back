@@ -5,6 +5,7 @@ import { Organization } from './organization.entity'
 import { CreateOrganizationDto } from './dto/create-organization'
 import { User } from '../users/user.entity'
 import * as slugify from '../../common/utils/slugify'
+import { OrganizationSize } from './organization.types'
 
 const oneOrganization = new Organization()
 oneOrganization.id = 1
@@ -66,6 +67,7 @@ describe('OrganizationsService', () => {
       const organization: CreateOrganizationDto = {
         name: 'Organization Name',
         country: 'France',
+        size: OrganizationSize['1-9'],
       }
 
       mockUserRepository.findOne.mockResolvedValue({
@@ -83,6 +85,7 @@ describe('OrganizationsService', () => {
       const organization: CreateOrganizationDto = {
         name: 'Organization Name',
         country: 'France',
+        size: OrganizationSize['1-9'],
       }
 
       mockUserRepository.findOne.mockResolvedValue({
@@ -99,6 +102,7 @@ describe('OrganizationsService', () => {
       const organization: CreateOrganizationDto = {
         name: 'Organization Name',
         country: 'France',
+        size: OrganizationSize['1-9'],
       }
 
       mockUserRepository.findOne.mockResolvedValue(null)
