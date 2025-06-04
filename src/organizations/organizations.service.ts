@@ -34,6 +34,10 @@ export class OrganizationsService {
       )
     }
 
+    const userWithoutOrganization = await this.userRepository.findOne({
+      where: { id: userId },
+    })
+
     const newOrganization = new Organization()
     newOrganization.slug =
       slugify(organization.name) +
@@ -41,7 +45,8 @@ export class OrganizationsService {
       Math.random().toString(36).substring(2, 15)
     newOrganization.name = organization.name
     newOrganization.country = organization.country
-    newOrganization.owner = user
+    newOrganization.size = organization.size
+    newOrganization.owner = userWithoutOrganization!
 
     const organizationSaved =
       await this.organizationRepository.save(newOrganization)

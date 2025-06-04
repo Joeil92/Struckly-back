@@ -25,6 +25,14 @@ export class OrganizationsController {
     status: HttpStatus.CREATED,
     description: 'Successfully create organization',
   })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'User already has an organization',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'User not found',
+  })
   create(
     @Request() request: RequestAuthenticated,
     @Body() organization: CreateOrganizationDto
