@@ -20,7 +20,7 @@ export class MailerService {
     pugTemplatePath: string
   ): Promise<SentMessageInfo> {
     const compiledFunction = pug.compileFile(
-      `${__dirname}/../template/${pugTemplatePath}.pug`
+      `${__dirname}/../templates/${pugTemplatePath}.pug`
     )
     const html = compiledFunction(mailOptions.context)
 
