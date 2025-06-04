@@ -3,11 +3,11 @@ services:
     image: postgres:17
     restart: always
     env_file:
-      - .env
+      - ./config/env/.development.env
     ports:
       - 127.0.0.1:5432:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - struckly_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD', 'pg_isready']
       interval: 10s
@@ -20,4 +20,4 @@ services:
       - 127.0.0.1:8025:8025
       - 127.0.0.1:1025:1025
 volumes:
-  postgres_data:
+  struckly_data:

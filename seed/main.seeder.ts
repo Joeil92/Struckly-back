@@ -1,24 +1,29 @@
-import { User } from "../src/user/entity/user.entity";
-import { DataSource } from "typeorm";
-import { Seeder, SeederFactoryManager } from "typeorm-extension";
-import { Entreprise } from "../src/entreprise/entity/entreprise.entity";
-import { faker } from "@faker-js/faker";
+import { User } from '../src/users/user.entity'
+import { DataSource } from 'typeorm'
+import { Seeder, SeederFactoryManager } from 'typeorm-extension'
+import { Organization } from '../src/organizations/organization.entity'
+import { faker } from '@faker-js/faker'
 
 export class MainSeeder implements Seeder {
-    public async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
-        // User seeder
-        const users = await factoryManager.get(User).saveMany(500);
+  public async run(
+    dataSource: DataSource,
+    factoryManager: SeederFactoryManager
+  ): Promise<void> {
+    const usersFactory = factoryManager.get(User)
+    const organizationsFactory = factoryManager.get(Organization)
 
-        // Entreprise seeder
-        const entrepriseFactory = factoryManager.get(Entreprise);
-        const entreprises = await Promise.all(
-            Array.from({ length: 50 }, async () => {
-                const entreprise = await entrepriseFactory.make({
-                    users: faker.helpers.arrayElements(users, { min: 1, max: 10 })
-                });
-                return entreprise;
-            })
-        );
-        await dataSource.getRepository(Entreprise).save(entreprises);
+    const users = await usersFactory.saveMany(50)
+    const organizations = await organizationsFactory.saveMany(50)
+
+    for (let i = 0; i < users.length; i++) {
+      const user = users[i];
+      const organization = organizations[i];
+
+      user.organization = organization
+      organization.owner = user
     }
+
+    await dataSource.getRepository(User).save(users)
+    await dataSource.getRepository(Organization).save(organizations)
+  }
 }

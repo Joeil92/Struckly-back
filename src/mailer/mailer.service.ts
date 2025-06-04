@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { SendMailDto } from './dto/send-mail.dto'
 import * as nodemailer from 'nodemailer'
 import * as pug from 'pug'
+import { SentMessageInfo } from './types/Sent-message-info.interface'
 
 @Injectable()
 export class MailerService {
@@ -17,13 +18,14 @@ export class MailerService {
   async sendMail(
     mailOptions: SendMailDto,
     pugTemplatePath: string
-  ): Promise<nodemailer.SentMessageInfo> {
+  ): Promise<SentMessageInfo> {
     const compiledFunction = pug.compileFile(
-      `${__dirname}/../template/${pugTemplatePath}.pug`
+      `${__dirname}/../templates/${pugTemplatePath}.pug`
     )
     const html = compiledFunction(mailOptions.context)
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return await this.transporter.sendMail({
         ...mailOptions,
         html: html,
